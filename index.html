@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarun Munjani | AI/ML Engineer</title>
+    <title>Tarun Munjani | terminal_session_v4</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,34 +11,33 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Fira Code for that sweet monospace -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
                     },
                     colors: {
-                        space: {
-                            black: '#030712', // Very dark gray/black
-                            card: '#111827', // Gray 900
-                            border: '#1f2937', // Gray 800
-                            accent: '#8b5cf6', // Violet 500
-                            glow: '#a78bfa', // Violet 400
+                        term: {
+                            bg: '#0c0c0c',      // True Black
+                            card: '#111111',    // Off Black
+                            green: '#00ff41',   // Matrix Green
+                            dim: '#444444',     // Comment Grey
+                            border: '#333333',  // Subtle Border
                         }
                     },
                     animation: {
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 6s ease-in-out infinite',
+                        'blink': 'blink 1s step-end infinite',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
+                        blink: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0' },
                         }
                     }
                 }
@@ -48,494 +47,521 @@
 
     <style>
         body {
-            background-color: #030712;
-            color: #f3f4f6;
+            background-color: #0c0c0c;
+            color: #e5e5e5;
             overflow-x: hidden;
+            /* Default vars for spotlight to prevent errors before JS loads */
+            --x: 50%;
+            --y: 50%;
         }
 
-        /* Particles Canvas */
-        #particle-canvas {
+        /* Matrix Canvas Background */
+        #matrix-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
         }
 
-        /* Glassmorphism */
-        .glass {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        /* CRT Overlay Effects */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            pointer-events: none;
+            background: 
+                /* Scanlines */
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                /* RGB Split */
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+        }
+
+        /* Vignette (Dark Corners) */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 51;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.4) 90%, rgba(0,0,0,0.8) 100%);
+        }
+
+        /* Active Moving Scanline */
+        .scan-line {
+            position: fixed;
+            left: 0;
+            top: -10%;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(to bottom, rgba(0, 255, 65, 0), rgba(0, 255, 65, 0.2) 50%, rgba(0, 255, 65, 0));
+            opacity: 0.1;
+            animation: scan-move 8s linear infinite;
+            pointer-events: none;
+            z-index: 52;
+        }
+
+        /* Analog Noise Texture */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 53;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Mouse Follow Spotlight */
+        .spotlight {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 54;
+            background: radial-gradient(600px circle at var(--x) var(--y), rgba(0, 255, 65, 0.06), transparent 40%);
+        }
+
+        @keyframes scan-move {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        /* Phosphor Glow */
+        .text-glow {
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
+        }
+
+        /* Code Block Styling */
+        .code-block {
+            background-color: #0a0a0a;
+            border: 1px solid #333;
+            border-left: 4px solid #00ff41;
+            font-family: 'Fira Code', monospace;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
         }
         
-        .glass-hover:hover {
-            border-color: rgba(139, 92, 246, 0.5);
-            box-shadow: 0 0 30px -5px rgba(139, 92, 246, 0.15);
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        /* Text Gradient */
-        .text-gradient {
-            background: linear-gradient(to right, #c084fc, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
 
         /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #030712; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #374151; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4b5563; 
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0c0c0c; border-left: 1px solid #333; }
+        ::-webkit-scrollbar-thumb { background: #333; border: 2px solid #0c0c0c; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ff41; }
+        
+        .typewriter span {
+            border-right: .1em solid #00ff41;
+            animation: blink 1s step-end infinite;
         }
     </style>
 </head>
-<body class="antialiased selection:bg-violet-500/30 selection:text-violet-200">
+<body class="antialiased selection:bg-term-green selection:text-black">
 
-    <canvas id="particle-canvas"></canvas>
+    <!-- Background Effects -->
+    <canvas id="matrix-canvas"></canvas>
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
+    <div class="scan-line"></div>
+    <div class="noise-overlay"></div>
+    <div class="spotlight"></div>
 
-    <!-- Navbar -->
-    <nav class="fixed w-full z-50 transition-all duration-300 bg-space-black/80 backdrop-blur-md border-b border-white/5">
+    <!-- Top Status Bar -->
+    <div class="fixed top-0 w-full h-8 bg-term-card border-b border-term-border z-[60] flex items-center justify-between px-4 text-xs font-mono text-term-dim">
+        <div class="flex items-center gap-4">
+            <span class="text-term-green animate-pulse">● connected</span>
+            <span>user: tarun_munjani</span>
+            <span>loc: ~/mumbai/workspace</span>
+        </div>
+        <div class="hidden md:block">
+            <span>bash --login</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-8 w-full z-[60] bg-term-bg/90 backdrop-blur-sm border-b border-term-border transition-transform duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold font-mono tracking-tight flex items-center gap-2">
-                <span class="text-violet-500">&lt;</span>
-                <span class="text-white">Tarun Munjani</span>
-                <span class="text-violet-500">/&gt;</span>
+            <a href="#" class="text-lg font-bold font-mono tracking-tight flex items-center gap-2 group text-glow">
+                <span class="text-term-green group-hover:animate-blink">_</span>
+                <span>Tarun_Munjani.sh</span>
             </a>
             
-            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
-                <a href="#about" class="hover:text-white transition-colors">About</a>
-                <a href="#stack" class="hover:text-white transition-colors">Stack</a>
-                <a href="#projects" class="hover:text-white transition-colors">Projects</a>
-                <a href="#hackathons" class="hover:text-white transition-colors">Hackathons</a>
+            <div class="hidden md:flex space-x-8 text-sm font-mono text-gray-400">
+                <a href="#about" class="hover:text-term-green transition-colors hover:text-glow">[01] About</a>
+                <a href="#stack" class="hover:text-term-green transition-colors hover:text-glow">[02] Stack</a>
+                <a href="#projects" class="hover:text-term-green transition-colors hover:text-glow">[03] Projects</a>
+                <a href="#hackathons" class="hover:text-term-green transition-colors hover:text-glow">[04] Awards</a>
             </div>
 
-            <a href="#contact" class="px-4 py-2 bg-violet-600/10 border border-violet-500/50 text-violet-300 rounded hover:bg-violet-600 hover:text-white transition-all text-sm font-medium">
-                Hire Me
+            <a href="#contact" class="px-4 py-1 border border-term-green text-term-green font-mono text-xs hover:bg-term-green hover:text-black transition-all shadow-[0_0_10px_rgba(0,255,65,0.2)]">
+                ./contact_me.sh
             </a>
         </div>
     </nav>
 
     <!-- Hero -->
-    <section id="about" class="min-h-screen flex items-center justify-center relative pt-16">
-        <!-- Decorative Gradients -->
-        <div class="absolute top-20 right-0 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px] pointer-events-none"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px] pointer-events-none"></div>
-
-        <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
-            <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-violet-300 text-xs font-mono mb-6">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    Open to Work
+    <section id="about" class="min-h-screen flex items-center justify-center relative pt-24 border-b border-term-border">
+        <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+            <div class="font-mono reveal">
+                <div class="mb-6 text-term-dim text-sm">
+                    // initializing_career_sequence...<br>
+                    // location: Mumbai, IN
                 </div>
                 
-                <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                    Building the <br>
-                    <span class="text-gradient">Next Gen AI</span>
+                <h1 class="text-5xl md:text-7xl font-bold leading-none mb-6">
+                    Building <br>
+                    <span class="text-term-green typewriter text-glow">Next Gen AI<span></span></span>
                 </h1>
                 
-                <p class="text-gray-400 text-lg mb-8 max-w-lg leading-relaxed">
-                    ML Engineer & Researcher passionate about Deep Learning, Computer Vision, and turning data into decision-making systems.
+                <p class="text-gray-400 text-lg mb-8 max-w-lg leading-relaxed border-l border-term-dim pl-4 ml-1">
+                    <span class="text-term-green">const</span> <span class="text-white">mentality</span> = <span class="text-yellow-200">"First Principles"</span>;<br><br>
+                    I deconstruct complex theory into shipping code. Passionate about Deep Learning and Computer Vision, I build systems that solve real problems.
                 </p>
 
                 <div class="flex gap-4">
-                    <a href="#projects" class="px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]">
-                        View Work
+                    <a href="#projects" class="px-6 py-3 bg-term-green text-black font-bold font-mono hover:bg-white transition-colors hover:shadow-[0_0_15px_rgba(0,255,65,0.5)]">
+                        cd ./projects
                     </a>
-                    <a href="#hackathons" class="px-8 py-3 bg-transparent border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white font-medium rounded-lg transition-all">
-                        Awards
+                    <a href="#hackathons" class="px-6 py-3 border border-term-dim text-gray-400 font-mono hover:border-white hover:text-white transition-colors">
+                        cat ./awards.txt
                     </a>
                 </div>
             </div>
 
-            <!-- 3D Visual/Code Block -->
-            <div class="hidden md:block relative animate-float">
-                <div class="glass rounded-2xl p-6 relative">
-                    <!-- Top Bar -->
-                    <div class="flex items-center gap-2 mb-4 border-b border-white/5 pb-4">
-                        <div class="flex gap-1.5">
-                            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-                        </div>
-                        <div class="text-xs text-gray-500 font-mono ml-4">model_architecture.py</div>
-                    </div>
-                    <!-- Code -->
-                    <div class="font-mono text-sm space-y-2">
-                        <div class="flex"><span class="text-gray-500 w-8">1</span><span class="text-violet-400">import</span> <span class="text-white">torch</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">2</span><span class="text-violet-400">import</span> <span class="text-white">torch.nn</span> <span class="text-violet-400">as</span> <span class="text-white">nn</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">3</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">4</span><span class="text-violet-400">class</span> <span class="text-yellow-300">TransformerBlock</span>(<span class="text-white">nn.Module</span>):</div>
-                        <div class="flex"><span class="text-gray-500 w-8">5</span><span class="text-gray-500 pl-4"># Attention mechanism...</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">6</span><span class="text-violet-400 pl-4">def</span> <span class="text-blue-400">forward</span>(<span class="text-white">self, x</span>):</div>
-                        <div class="flex"><span class="text-gray-500 w-8">7</span><span class="text-white pl-8">attn_output, _ = self.mha(x, x, x)</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">8</span><span class="text-violet-400 pl-8">return</span> <span class="text-white">self.norm(x + attn_output)</span></div>
-                    </div>
-                    
-                    <!-- Floating Badge -->
-                    <div class="absolute -bottom-6 -right-6 bg-gray-900 border border-violet-500/30 p-4 rounded-xl shadow-xl flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div>
-                            <div class="text-xs text-gray-400">Model Accuracy</div>
-                            <div class="text-xl font-bold text-white">99.4%</div>
-                        </div>
-                    </div>
+            <!-- ASCII/Terminal Visual -->
+            <div class="hidden md:block reveal delay-200">
+                <div class="code-block p-6 rounded relative transform hover:scale-[1.02] transition-transform duration-300">
+                    <div class="absolute top-0 right-0 p-2 text-xs text-term-dim">vim model.py</div>
+                    <pre class="text-xs md:text-sm leading-relaxed overflow-x-auto">
+<span class="text-purple-400">import</span> torch
+<span class="text-purple-400">import</span> torch.nn <span class="text-purple-400">as</span> nn
+
+<span class="text-gray-500"># Defining the architecture</span>
+<span class="text-purple-400">class</span> <span class="text-yellow-200">TransformerBlock</span>(nn.Module):
+    <span class="text-purple-400">def</span> <span class="text-blue-400">__init__</span>(self, embed_size, heads):
+        <span class="text-purple-400">super</span>(TransformerBlock, self).__init__()
+        self.attention = SelfAttention(embed_size)
+        self.norm1 = nn.LayerNorm(embed_size)
+        
+    <span class="text-purple-400">def</span> <span class="text-blue-400">forward</span>(self, value, key, query):
+        <span class="text-gray-500"># Forward pass logic</span>
+        attention = self.attention(value, key)
+        x = self.norm1(attention + query)
+        <span class="text-purple-400">return</span> x
+
+<span class="text-term-green text-glow">>> Model Compiled Successfully.</span>
+<span class="text-term-green text-glow">>> Accuracy: 99.4%</span>
+                    </pre>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Stack Section -->
-    <section id="stack" class="py-20 relative">
+    <section id="stack" class="py-24 border-b border-term-border">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-12 text-center">Tech <span class="text-gradient">Arsenal</span></h2>
+            <div class="mb-12 font-mono reveal">
+                <h2 class="text-3xl font-bold text-white text-glow">/bin/skills</h2>
+                <p class="text-term-dim text-sm mt-2">Listing executable competencies...</p>
+            </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <!-- 1. Python & Core -->
-                <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <i class="fab fa-python text-4xl text-gray-400 group-hover:text-yellow-400 mb-4 transition-colors"></i>
-                    <h3 class="font-bold text-lg">Python</h3>
-                    <p class="text-xs text-gray-500 mt-2">NumPy, Pandas</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-sm">
+                <!-- 1 -->
+                <div class="border border-term-border p-4 hover:border-term-green hover:bg-term-card transition-all group reveal delay-100 hover:shadow-[0_0_10px_rgba(0,255,65,0.1)]">
+                    <div class="text-term-dim mb-2 text-xs">01</div>
+                    <i class="fab fa-python text-2xl text-gray-500 group-hover:text-term-green mb-3 transition-colors"></i>
+                    <div class="font-bold">Python.exe</div>
+                    <div class="text-xs text-gray-500 mt-1">NumPy, Pandas</div>
                 </div>
 
-                <!-- 2. Visualization -->
-                <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <i class="fas fa-chart-bar text-4xl text-gray-400 group-hover:text-pink-400 mb-4 transition-colors"></i>
-                    <h3 class="font-bold text-lg">Data Viz</h3>
-                    <p class="text-xs text-gray-500 mt-2">Matplotlib, Seaborn</p>
+                <!-- 2 -->
+                <div class="border border-term-border p-4 hover:border-term-green hover:bg-term-card transition-all group reveal delay-200 hover:shadow-[0_0_10px_rgba(0,255,65,0.1)]">
+                    <div class="text-term-dim mb-2 text-xs">02</div>
+                    <i class="fas fa-chart-bar text-2xl text-gray-500 group-hover:text-term-green mb-3 transition-colors"></i>
+                    <div class="font-bold">DataViz.lib</div>
+                    <div class="text-xs text-gray-500 mt-1">Matplotlib</div>
                 </div>
 
-                <!-- 3. Scikit-Learn -->
-                <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <i class="fas fa-brain text-4xl text-gray-400 group-hover:text-cyan-400 mb-4 transition-colors"></i>
-                    <h3 class="font-bold text-lg">Scikit-Learn</h3>
-                    <p class="text-xs text-gray-500 mt-2">Classical ML</p>
+                <!-- 3 -->
+                <div class="border border-term-border p-4 hover:border-term-green hover:bg-term-card transition-all group reveal delay-300 hover:shadow-[0_0_10px_rgba(0,255,65,0.1)]">
+                    <div class="text-term-dim mb-2 text-xs">03</div>
+                    <i class="fas fa-brain text-2xl text-gray-500 group-hover:text-term-green mb-3 transition-colors"></i>
+                    <div class="font-bold">SciKit.py</div>
+                    <div class="text-xs text-gray-500 mt-1">Classical ML</div>
                 </div>
 
-                <!-- 4. TensorFlow -->
-                <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <div class="text-4xl text-gray-400 group-hover:text-orange-500 mb-4 transition-colors font-bold select-none">TF</div>
-                    <h3 class="font-bold text-lg">TensorFlow</h3>
-                    <p class="text-xs text-gray-500 mt-2">Deep Learning</p>
+                <!-- 4 -->
+                <div class="border border-term-border p-4 hover:border-term-green hover:bg-term-card transition-all group reveal delay-100 hover:shadow-[0_0_10px_rgba(0,255,65,0.1)]">
+                    <div class="text-term-dim mb-2 text-xs">04</div>
+                    <div class="text-2xl text-gray-500 group-hover:text-term-green mb-3 font-bold transition-colors">TF</div>
+                    <div class="font-bold">TensorFlow</div>
+                    <div class="text-xs text-gray-500 mt-1">Deep Learning</div>
                 </div>
 
-                <!-- 5. PyTorch
-                <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <div class="text-4xl text-gray-400 group-hover:text-red-500 mb-4 transition-colors font-bold select-none">Py</div>
-                    <h3 class="font-bold text-lg">PyTorch</h3>
-                    <p class="text-xs text-gray-500 mt-2">Deep Learning</p>
-                </div> -->
-
-                <!-- 6. FastAPI -->
-                <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <i class="fas fa-bolt text-4xl text-gray-400 group-hover:text-teal-400 mb-4 transition-colors"></i>
-                    <h3 class="font-bold text-lg">FastAPI</h3>
-                    <p class="text-xs text-gray-500 mt-2">Model Serving</p>
+                <!-- 6 -->
+                <div class="border border-term-border p-4 hover:border-term-green hover:bg-term-card transition-all group reveal delay-200 hover:shadow-[0_0_10px_rgba(0,255,65,0.1)]">
+                    <div class="text-term-dim mb-2 text-xs">06</div>
+                    <i class="fas fa-bolt text-2xl text-gray-500 group-hover:text-term-green mb-3 transition-colors"></i>
+                    <div class="font-bold">FastAPI</div>
+                    <div class="text-xs text-gray-500 mt-1">Deployment</div>
                 </div>
 
-                <!-- 7. Docker -->
-                <!-- <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <i class="fab fa-docker text-4xl text-gray-400 group-hover:text-blue-400 mb-4 transition-colors"></i>
-                    <h3 class="font-bold text-lg">Docker</h3>
-                    <p class="text-xs text-gray-500 mt-2">Deployment</p>
-                </div> -->
-
-                <!-- 8. Tools -->
-                 <div class="glass p-6 rounded-xl hover:bg-white/5 transition duration-300 group text-center border-t border-transparent hover:border-violet-500/50">
-                    <i class="fas fa-terminal text-4xl text-gray-400 group-hover:text-green-400 mb-4 transition-colors"></i>
-                    <h3 class="font-bold text-lg">Tools</h3>
-                    <p class="text-xs text-gray-500 mt-2">Git, Linux</p>
+                <!-- 8 -->
+                 <div class="border border-term-border p-4 hover:border-term-green hover:bg-term-card transition-all group reveal delay-300 hover:shadow-[0_0_10px_rgba(0,255,65,0.1)]">
+                    <div class="text-term-dim mb-2 text-xs">08</div>
+                    <i class="fas fa-terminal text-2xl text-gray-500 group-hover:text-term-green mb-3 transition-colors"></i>
+                    <div class="font-bold">Linux_Env</div>
+                    <div class="text-xs text-gray-500 mt-1">Git, Bash</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Projects Section -->
-    <section id="projects" class="py-20 bg-space-black">
+    <section id="projects" class="py-24 border-b border-term-border">
         <div class="container mx-auto px-6">
-            <div class="flex justify-between items-end mb-12">
-                <div>
-                    <h2 class="text-3xl font-bold">Featured <span class="text-gradient">Projects</span></h2>
-                    <p class="text-gray-400 mt-2">A selection of my recent research and builds.</p>
-                </div>
+            <div class="mb-12 font-mono reveal">
+                <h2 class="text-3xl font-bold text-white text-glow">git log --projects</h2>
+                <p class="text-term-dim text-sm mt-2">Recent commits to production</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-2 gap-8">
                 <!-- Project 1 -->
-                <div class="glass glass-hover rounded-2xl overflow-hidden group transition-all duration-300">
-                    <div class="h-48 bg-gradient-to-br from-gray-800 to-gray-900 relative">
-                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <i class="fas fa-face-smile text-4xl text-gray-600 group-hover:text-violet-400 transition duration-300"></i>
-                        </div>
+                <div class="border border-term-border bg-term-card group hover:border-term-green transition-all reveal delay-100 hover:shadow-[0_0_15px_rgba(0,255,65,0.1)]">
+                    <div class="h-48 bg-black relative flex items-center justify-center border-b border-term-border overflow-hidden">
+                        <!-- Grid overlay -->
+                        <div class="absolute inset-0" style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; opacity: 0.3;"></div>
+                        <i class="fas fa-face-smile text-5xl text-gray-700 group-hover:text-term-green transition-all duration-300 transform group-hover:scale-110 group-hover:text-glow"></i>
                     </div>
-                    <div class="p-6">
-                        <div class="text-xs font-mono text-violet-400 mb-2">Natural Language Processing</div>
-                        <h3 class="text-xl font-bold mb-3 group-hover:text-violet-300 transition-colors">VADER Twitter Sentiment Analyzer</h3>
-                        <p class="text-gray-400 text-sm mb-4 leading-relaxed">
-                            Lexicon-based NLP tool that analyzes Twitter post links to classify sentiment (positive, negative, neutral) with real-time polarity scoring.
-                        </p>
-                        <div class="pt-4 border-t border-white/5 flex items-center justify-between">
-                            <div class="flex flex-wrap gap-2">
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Python</span>
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">NLTK (VADER)</span>
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Flask</span>
-
+                    <div class="p-6 font-mono">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-xs text-term-green border border-term-green px-1">PUBLIC</span>
+                                <h3 class="text-xl font-bold text-white mt-2">VADER Sentiment Analyzer</h3>
                             </div>
-                            <a href="https://github.com/deepseek23/Sentiment-analysis-of-comments-and-recent-post.git" class="text-gray-400 hover:text-white transition-colors transform hover:scale-110" title="View Code">
+                            <a href="https://github.com/deepseek23/Sentiment-analysis-of-comments-and-recent-post.git" class="text-gray-500 hover:text-white transition-colors">
                                 <i class="fab fa-github text-xl"></i>
                             </a>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed font-sans">
+                            Lexicon-based NLP tool that analyzes Twitter post links to classify sentiment (positive, negative, neutral) with real-time polarity scoring.
+                        </p>
+                        <div class="text-xs text-gray-500">
+                            > stack: [Python, NLTK, Flask]
                         </div>
                     </div>
                 </div>
 
                 <!-- Project 2 -->
-                <div class="glass glass-hover rounded-2xl overflow-hidden group transition-all duration-300">
-                    <div class="h-48 bg-gradient-to-br from-gray-800 to-gray-900 relative">
-                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <i class="fas fa-leaf text-4xl text-gray-600 group-hover:text-blue-400 transition duration-300"></i>
-                        </div>
+                <div class="border border-term-border bg-term-card group hover:border-term-green transition-all reveal delay-200 hover:shadow-[0_0_15px_rgba(0,255,65,0.1)]">
+                    <div class="h-48 bg-black relative flex items-center justify-center border-b border-term-border overflow-hidden">
+                        <div class="absolute inset-0" style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; opacity: 0.3;"></div>
+                        <i class="fas fa-leaf text-5xl text-gray-700 group-hover:text-term-green transition-all duration-300 transform group-hover:scale-110 group-hover:text-glow"></i>
                     </div>
-                    <div class="p-6">
-                        <div class="text-xs font-mono text-blue-400 mb-2">Sustainability Analytics</div>
-                        <h3 class="text-xl font-bold mb-3 group-hover:text-blue-300 transition-colors">Carbon Footprint Tracker</h3>
-                        <p class="text-gray-400 text-sm mb-4 leading-relaxed">
-                            Web-based system that calculates individual carbon emissions based on lifestyle inputs (transport, electricity, diet) and provides actionable reduction insights with data visualization.
-                        </p>
-                        <div class="pt-4 border-t border-white/5 flex items-center justify-between">
-                            <div class="flex flex-wrap gap-2">
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Python</span>
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Django</span>
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Scikit-Learn</span>
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Postger-SQL</span>
-
-
+                    <div class="p-6 font-mono">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-xs text-term-green border border-term-green px-1">PUBLIC</span>
+                                <h3 class="text-xl font-bold text-white mt-2">Carbon Footprint Tracker</h3>
                             </div>
-                            <a href="https://github.com/deepseek23/new-carbon.git" class="text-gray-400 hover:text-white transition-colors transform hover:scale-110" title="View Code">
+                            <a href="https://github.com/deepseek23/new-carbon.git" class="text-gray-500 hover:text-white transition-colors">
                                 <i class="fab fa-github text-xl"></i>
                             </a>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed font-sans">
+                            Web-based system that calculates individual carbon emissions based on lifestyle inputs and provides actionable reduction insights.
+                        </p>
+                        <div class="text-xs text-gray-500">
+                            > stack: [Django, Sklearn, Postgres]
                         </div>
                     </div>
                 </div>
-
-                <!-- Project 3 -->
-                <!-- <div class="glass glass-hover rounded-2xl overflow-hidden group transition-all duration-300">
-                    <div class="h-48 bg-gradient-to-br from-gray-800 to-gray-900 relative">
-                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <i class="fas fa-chart-line text-4xl text-gray-600 group-hover:text-green-400 transition duration-300"></i>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="text-xs font-mono text-green-400 mb-2">Data Science</div>
-                        <h3 class="text-xl font-bold mb-3 group-hover:text-green-300 transition-colors">Crypto Price Predictor</h3>
-                        <p class="text-gray-400 text-sm mb-4 leading-relaxed">
-                            Time-series forecasting using LSTM networks. Visualized trends with Streamlit and deployed via Docker.
-                        </p>
-                        <div class="pt-4 border-t border-white/5 flex items-center justify-between">
-                            <div class="flex flex-wrap gap-2">
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">TensorFlow</span>
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Streamlit</span>
-                            </div>
-                            <a href="#" class="text-gray-400 hover:text-white transition-colors transform hover:scale-110" title="View Code">
-                                <i class="fab fa-github text-xl"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </div>
     </section>
 
-
     <!-- Hackathons Section -->
-    <section id="hackathons" class="py-20 relative overflow-hidden">
-        <!-- Background Element -->
-        <div class="absolute top-1/2 left-0 w-64 h-64 bg-violet-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-
+    <section id="hackathons" class="py-24 border-b border-term-border bg-black">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-12 text-center">Hackathon <span class="text-gradient">Victories</span></h2>
+            <div class="mb-12 font-mono text-center reveal">
+                <h2 class="text-3xl font-bold text-white text-glow">./trophy_room</h2>
+            </div>
             
             <div class="space-y-6 max-w-4xl mx-auto">
-                <!-- Win 1 -->
-                <div class="glass glass-hover p-6 rounded-2xl transition-all duration-300">
-                    <div class="flex flex-col md:flex-row gap-8 items-center">
-                        <!-- Winning Picture Section -->
-                        <div class="w-full md:w-5/12 relative group overflow-hidden rounded-xl flex-shrink-0">
-                             <div class="aspect-video bg-gray-800 relative overflow-hidden">
-                                <!-- Placeholder Image for Winning Moment -->
-                                   <img src="./Screenshot 2026-02-11 224759.png" alt="Hackathon Winning Team" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-4">
-                                     <span class="text-xs font-mono text-yellow-300 flex items-center gap-2">
-                                        <i class="fas fa-camera"></i> Winning Moment
-                                     </span>
-                                </div>
-                             </div>
-                        </div>
+                <!-- Win 1 (Featured) -->
+                <div class="border border-term-border p-4 md:flex gap-6 hover:border-yellow-500 transition-colors reveal delay-100 hover:shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                    <div class="md:w-5/12 relative bg-gray-900 border border-term-border group overflow-hidden">
+                         <img src="/Portfolio/Screenshot 2026-02-11 224759.png" alt="Winning Team" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105">
+                         <div class="absolute bottom-0 left-0 bg-yellow-500 text-black font-mono text-xs px-2 py-1 font-bold">RANK: 01</div>
+                    </div>
 
-                        <!-- Content -->
-                        <div class="flex-grow text-center md:text-left">
-                             <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4 justify-center md:justify-start">
-                                <div class="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 flex-shrink-0">
-                                    <i class="fas fa-trophy text-yellow-400 text-sm"></i>
-                                </div>
-                                <h3 class="text-xl font-bold text-white">1st Place - Hackathonicx by Get Analyticx AI Hackathon</h3>
-                                <span class="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30">Winner</span>
-                            </div>
-                            <p class="text-gray-400 text-sm mb-5 leading-relaxed">
-                                Built during a competitive hackathon, this lexicon-based NLP tool analyzes Twitter post links to classify sentiment (positive, negative, neutral) with real-time polarity scoring — and secured 1st place in the competition.
-                            </p>
-                            <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-                                <span class="text-xs text-gray-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">#NLTK (VADER)</span>
-                            </div>
+                    <div class="md:w-7/12 py-2 flex flex-col justify-center font-mono">
+                        <div class="flex items-center gap-2 mb-2 text-yellow-500">
+                             <i class="fas fa-trophy"></i>
+                             <span class="text-xs">WINNER :: GOLD</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Hackathonicx Hackathon</h3>
+                        <p class="text-gray-400 text-sm mb-4 font-sans">
+                            Built during a competitive hackathon, this lexicon-based NLP tool analyzes Twitter post links to classify sentiment with real-time polarity scoring.
+                        </p>
+                        <div class="text-xs text-gray-500">
+                            Tags: #NLTK #VADER #AI
                         </div>
                     </div>
                 </div>
 
                 <!-- Win 2 -->
-                <!-- <div class="glass glass-hover p-8 rounded-2xl flex flex-col md:flex-row gap-6 items-center transition-all duration-300">
-                     <div class="flex-shrink-0">
-                        <div class="w-16 h-16 rounded-full bg-gray-500/10 flex items-center justify-center border border-gray-500/30">
-                            <i class="fas fa-medal text-2xl text-gray-300"></i>
-                        </div>
+                <div class="border border-term-border p-6 flex flex-col md:flex-row gap-6 items-center hover:border-gray-500 transition-colors reveal delay-200">
+                     <div class="flex-shrink-0 w-12 h-12 border border-term-border flex items-center justify-center">
+                        <i class="fas fa-medal text-xl text-gray-400"></i>
                     </div>
-                    <div class="flex-grow text-center md:text-left">
-                        <div class="flex flex-col md:flex-row md:items-center gap-2 mb-2 justify-center md:justify-start">
-                            <h3 class="text-xl font-bold text-white">Best Use of Cloud - CloudHacks 2023</h3>
-                            <span class="text-xs bg-gray-500/20 text-gray-300 px-2 py-0.5 rounded border border-gray-500/30">Special Track</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-3">
+                    <div class="flex-grow font-mono">
+                        <h3 class="text-lg font-bold text-white mb-1">CloudHacks 2023</h3>
+                        <div class="text-xs text-term-green mb-2">Award: Best Use of Cloud</div>
+                        <p class="text-gray-400 text-sm font-sans">
                             Developed a serverless distributed computing system for processing satellite imagery using AWS Lambda.
                         </p>
-                        <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-                            <span class="text-xs text-gray-500 font-mono">#AWS</span>
-                            <span class="text-xs text-gray-500 font-mono">#Lambda</span>
-                        </div>
                     </div>
                     <div class="flex-shrink-0">
-                        <a href="#" class="px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm transition-colors flex items-center gap-2">
-                            Demo <i class="fas fa-play text-xs"></i>
+                        <a href="#" class="text-xs font-mono text-term-dim hover:text-white underline">
+                            view_demo.mp4
                         </a>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Contact -->
-    <section id="contact" class="py-20">
-        <div class="container mx-auto px-6 max-w-4xl">
-            <div class="glass rounded-2xl p-10 text-center border border-violet-500/20 shadow-[0_0_50px_rgba(139,92,246,0.1)]">
-                <h2 class="text-3xl font-bold mb-6">Ready to <span class="text-violet-400">Collaborate?</span></h2>
-                <p class="text-gray-400 mb-8 max-w-xl mx-auto">
-                    I'm actively looking for internships opportunities for Fall 2026.
+    <section id="contact" class="py-24">
+        <div class="container mx-auto px-6 max-w-3xl text-center font-mono reveal">
+            <div class="border border-term-green p-10 bg-term-card relative group hover:shadow-[0_0_30px_rgba(0,255,65,0.15)] transition-shadow duration-500">
+                <!-- Decorative screws -->
+                <div class="absolute top-2 left-2 text-term-dim">+</div>
+                <div class="absolute top-2 right-2 text-term-dim">+</div>
+                <div class="absolute bottom-2 left-2 text-term-dim">+</div>
+                <div class="absolute bottom-2 right-2 text-term-dim">+</div>
+
+                <h2 class="text-2xl font-bold text-white mb-4 text-glow">Initialize_Connection()</h2>
+                <p class="text-gray-400 text-sm mb-8 font-sans">
+                    Looking for internships opportunities for Fall 2026. <br>
+                    Transmission lines are open.
                 </p>
-                <a href="mailto:t.s.clashers@gmail.com" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-lg hover:bg-violet-400 hover:scale-105 transition-all duration-300">
-                    <i class="fas fa-paper-plane"></i> Send Email
+                
+                <a href="mailto:t.s.clashers@gmail.com" class="inline-block px-8 py-3 bg-term-green text-black font-bold hover:bg-white transition-colors">
+                    Send_Email >>
                 </a>
 
-                <div class="mt-12 flex justify-center gap-8 text-2xl text-gray-500">
-                    <a href="https://github.com/deepseek23" class="hover:text-white transition-colors transform hover:-translate-y-1"><i class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/tarun-munjani-72a4b3341/" class="hover:text-blue-400 transition-colors transform hover:-translate-y-1"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://x.com/munjani_tarun" class="hover:text-sky-400 transition-colors transform hover:-translate-y-1"><i class="fab fa-twitter"></i></a>
+                <div class="mt-12 flex justify-center gap-8 text-xl">
+                    <a href="https://github.com/deepseek23" class="text-gray-500 hover:text-white transition-colors transform hover:-translate-y-1"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/tarun-munjani-72a4b3341/" class="text-gray-500 hover:text-blue-400 transition-colors transform hover:-translate-y-1"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://x.com/munjani_tarun" class="text-gray-500 hover:text-white transition-colors transform hover:-translate-y-1"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
-            <div class="text-center mt-12 text-sm text-gray-600">
-                &copy; 2026 Tarun Munjani. 
+            
+            <div class="text-center mt-12 text-xs text-term-dim">
+                // © 2026 Tarun Munjani. All systems nominal.
             </div>
         </div>
     </section>
 
     <script>
-        // Particle Network Animation
-        const canvas = document.getElementById('particle-canvas');
+        // --- Matrix Rain Animation ---
+        const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
-        
-        let width, height;
-        let particles = [];
-        const particleCount = 50;
-        const connectionDistance = 150;
 
-        function resize() {
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        // Binary characters
+        const str = "10";
+        const fontSize = 14;
+        const columns = width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            // Fading trail effect
+            ctx.fillStyle = "rgba(12, 12, 12, 0.05)";
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = "#00ff41"; // Matrix Green
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = str[Math.floor(Math.random() * str.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        // --- Mouse Spotlight Effect ---
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            document.body.style.setProperty('--x', x + 'px');
+            document.body.style.setProperty('--y', y + 'px');
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
+        });
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2 + 1;
-            }
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
+        // --- Scroll Reveal Animation ---
+        const revealElements = document.querySelectorAll('.reveal');
 
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(139, 92, 246, 0.5)'; // Violet
-                ctx.fill();
-            }
-        }
-
-        function init() {
-            particles = [];
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            particles.forEach((p, index) => {
-                p.update();
-                p.draw();
-
-                // Draw Connections
-                for (let j = index + 1; j < particles.length; j++) {
-                    const p2 = particles[j];
-                    const dx = p.x - p2.x;
-                    const dy = p.y - p2.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < connectionDistance) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(139, 92, 246, ${0.15 * (1 - distance / connectionDistance)})`;
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
-                    }
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Reveal once
                 }
             });
-            
-            requestAnimationFrame(animate);
-        }
+        }, {
+            root: null,
+            threshold: 0.15, // Trigger when 15% visible
+            rootMargin: "0px"
+        });
 
-        init();
-        animate();
+        revealElements.forEach(el => revealObserver.observe(el));
     </script>
 </body>
 </html>
