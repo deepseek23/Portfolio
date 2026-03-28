@@ -182,16 +182,16 @@
                         <div class="text-xs text-gray-500 font-mono ml-4">model_architecture.py</div>
                     </div>
                     <!-- Code -->
-                    <div class="font-mono text-sm space-y-2">
-                        <div class="flex"><span class="text-gray-500 w-8">1</span><span class="text-violet-400">import</span> <span class="text-white">torch</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">2</span><span class="text-violet-400">import</span> <span class="text-white">torch.nn</span> <span class="text-violet-400">as</span> <span class="text-white">nn</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">3</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">4</span><span class="text-violet-400">class</span> <span class="text-yellow-300">TransformerBlock</span>(<span class="text-white">nn.Module</span>):</div>
-                        <div class="flex"><span class="text-gray-500 w-8">5</span><span class="text-gray-500 pl-4"># Attention mechanism...</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">6</span><span class="text-violet-400 pl-4">def</span> <span class="text-blue-400">forward</span>(<span class="text-white">self, x</span>):</div>
-                        <div class="flex"><span class="text-gray-500 w-8">7</span><span class="text-white pl-8">attn_output, _ = self.mha(x, x, x)</span></div>
-                        <div class="flex"><span class="text-gray-500 w-8">8</span><span class="text-violet-400 pl-8">return</span> <span class="text-white">self.norm(x + attn_output)</span></div>
-                    </div>
+                   <div class="font-mono text-sm space-y-2">
+    <div class="flex"><span class="text-gray-500 w-8">1</span><span class="text-violet-400">import</span> <span class="text-white">tensorflow</span> <span class="text-violet-400">as</span> <span class="text-white">tf</span></div>
+    <div class="flex"><span class="text-gray-500 w-8">2</span><span class="text-violet-400">from</span> <span class="text-white">tensorflow.keras</span> <span class="text-violet-400">import</span> <span class="text-white">layers</span></div>
+    <div class="flex"><span class="text-gray-500 w-8">3</span></div>
+    <div class="flex"><span class="text-gray-500 w-8">4</span><span class="text-violet-400">class</span> <span class="text-yellow-300">TransformerBlock</span>(<span class="text-white">layers.Layer</span>):</div>
+    <div class="flex"><span class="text-gray-500 w-8">5</span><span class="text-gray-500 pl-4"># Attention mechanism...</span></div>
+    <div class="flex"><span class="text-gray-500 w-8">6</span><span class="text-violet-400 pl-4">def</span> <span class="text-blue-400">call</span>(<span class="text-white">self, x</span>):</div>
+    <div class="flex"><span class="text-gray-500 w-8">7</span><span class="text-white pl-8">attn_output = self.mha(x, x, x)</span></div>
+    <div class="flex"><span class="text-gray-500 w-8">8</span><span class="text-violet-400 pl-8">return</span> <span class="text-white">self.norm(x + attn_output)</span></div>
+</div>
                     
                     <!-- Floating Badge -->
                     <div class="absolute -bottom-6 -right-6 bg-gray-900 border border-violet-500/30 p-4 rounded-xl shadow-xl flex items-center gap-3">
@@ -287,7 +287,7 @@
                         <div class="pt-4 border-t border-white/5 flex items-center justify-between mt-auto">
                             <div class="flex flex-wrap gap-2">
                                 <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Python</span>
-                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">NLTK (VADER)</span>
+                                <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">NLP (VADER)</span>
                                 <span class="text-xs bg-white/5 px-2 py-1 rounded text-gray-300">Flask</span>
                             </div>
                             <a href="https://github.com/deepseek23/Sentiment-analysis-of-comments-and-recent-post.git" target="_blank" class="text-gray-400 hover:text-white transition-colors transform hover:scale-110" title="View Code">
@@ -405,7 +405,7 @@
                                 Built during a competitive hackathon, this lexicon-based NLP tool analyzes Twitter post links to classify sentiment (positive, negative, neutral) with real-time polarity scoring — and secured 1st place in the competition.
                             </p>
                             <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-                                <span class="text-xs text-gray-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">#NLTK (VADER)</span>
+                                <span class="text-xs text-gray-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">#NLP (VADER)</span>
                             </div>
                         </div>
                     </div>
